@@ -1,5 +1,9 @@
 # Flutter CI/CD with Codemagic, Slyph & AWS Device Farm
 
+A common problem with developing for mobile is the sheer variety of device options that have to be tested for when designing UI. Traditionally teams might have had a set of different mobile devices that could be used to verify a consistent expereience however without automation this QA process is easy to ignore.
+
+In this post we're going to look at a recent feature that [Codemagic](https://codemagic.io) has begun to offer that allows automated integration testing of mobile devices to be baked into CI/CD pipelines. The feature is built ontop of [Sylph](https://github.com/mmcc007/sylph) which is a Flutter specific toolchain for orchestrating [AWS Device Farm](https://aws.amazon.com/device-farm/).
+
 ## Requirements
 
 * [Flutter installed](https://flutter.dev/docs/get-started/install) and up to date
