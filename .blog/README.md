@@ -1,8 +1,8 @@
 # Flutter CI/CD with Codemagic, Sylph & AWS Device Farm
 
-A common problem with developing for mobile is the sheer variety of device options that have to be tested for when designing UI. Traditionally teams might have had a set of different mobile devices that could be used to verify a consistent expereience however without automation this QA process is easy to ignore.
+A common problem with developing for mobile is the sheer variety of device options that have to be tested for when designing UI. Traditionally teams might have had a set of different mobile devices that could be used to verify a consistent experience however without automation this QA process is easy to ignore.
 
-In this post we're going to look at a recent feature that [Codemagic](https://codemagic.io) has begun to offer that allows automated integration testing of mobile devices to be baked into CI/CD pipelines. The feature is built ontop of [Sylph](https://github.com/mmcc007/sylph) which is a Flutter specific toolchain for orchestrating [AWS Device Farm](https://aws.amazon.com/device-farm/).
+In this post we're going to look at a recent feature that [Codemagic](https://codemagic.io) has begun to offer that allows automated integration testing of mobile devices to be baked into CI/CD pipelines. The feature is built on-top of [Sylph](https://github.com/mmcc007/sylph) which is a [Flutter](https://flutter.dev/) specific toolchain for orchestrating [AWS Device Farm](https://aws.amazon.com/device-farm/).
 
 ## Requirements
 
@@ -11,7 +11,7 @@ In this post we're going to look at a recent feature that [Codemagic](https://co
 
 ## Create Flutter Project
 
-We'll start off by creating a new Flutter project that can be used for this demo. I've used VSCode to perform this step. We'll be stting up just enough in order to builld for Android & iOS.
+We'll start off by creating a new [Flutter](https://flutter.dev/) project that can be used for this demo. I've used VSCode to perform this step. We'll be setting up just enough in order to build for Android & iOS.
 
 ![VSCode Create Flutter Project](img/vscode-create-flutter-project.png)
 
@@ -24,7 +24,7 @@ flutter create --ios-language swift --android-language kotlin .
 
 ## Run Flutter Project
 
-Before doing anything, we should first check to ensure that Flutter builds and runs for each device type locally. Follow the steps below to run the application for each device type.
+Before doing anything, we should first check to ensure that [Flutter](https://flutter.dev/) builds and runs for each device type locally. Follow the steps below to run the application for each device type.
 
 You can list the available emulators by running the following command:
 
@@ -55,7 +55,7 @@ flutter run
 
 ## Push Flutter Project
 
-We're making use of [Codemagic CI/CD](https://blog.codemagic.io/) for the automated integration and deployment of our Flutter project. Because of this we'll have to push our repository to a source control provider like GitHub that will be monitored and acted on when we make changes to the repository.
+We're making use of [Codemagic CI/CD](https://codemagic.io) for the automated integration and deployment of our [Flutter](https://flutter.dev/) project. Because of this we'll have to push our repository to a source control provider like GitHub that will be monitored and acted on when we make changes to the repository.
 
 Create a new repository from the [following page](https://github.com/new)
 
@@ -73,9 +73,9 @@ git push -u origin master
 
 ## Codemagic Setup
 
-Before diving into device farm we should also ensure that the current Flutter app builds okay on Codemagic. Once this is confirmed we'll be able to iterate faster while we're learning. You can access Codemagic at [https://codemagic.io/apps](https://codemagic.io/apps).
+Before diving into device farm we should also ensure that the current [Flutter](https://flutter.dev/) app builds okay on [Codemagic](https://codemagic.io). Once this is confirmed we'll be able to iterate faster while we're learning. You can access Codemagic at [https://codemagic.io/apps](https://codemagic.io/apps).
 
-Sign in with your account (preferably GitHub since we've already pushed our project there). Once signed in import the new repoistory as a Codemagic project.
+Sign in with your account (preferably GitHub since we've already pushed our project there). Once signed in import the new repository as a [Codemagic](https://codemagic.io) project.
 
 ![Codemagic Import Device farm project](img/codemagic-device-farm-import.png)
 
@@ -89,7 +89,7 @@ The build could take up to 5 minutes to complete as it builds for both iOS and A
 
 ## Sylph Introduction
 
-[Sylph](https://github.com/mmcc007/sylph) is a wrapper around AWS Device farm that helps run integration tests for Flutter projects. It orchestrates device farm instances (both Android & iOS) that will run the Flutter code we push to it.
+[Sylph](https://github.com/mmcc007/sylph) is a wrapper around AWS Device farm that helps run integration tests for [Flutter](https://flutter.dev/) projects. It orchestrates device farm instances (both Android & iOS) that will run the [Flutter](https://flutter.dev/) code we push to it.
 
 ### flutter_driver dependency
 
