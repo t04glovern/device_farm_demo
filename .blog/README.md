@@ -309,3 +309,16 @@ aws cloudformation describe-stacks --stack-name iam-devicefarm-user \
 
 Finally we're able to setup Codemagic to use the credentials we just created to launch AWS Device Farm instances. Head back to Codemagic and go to the Settings page of the `device_farm_demo` project
 
+Expand the `test` step and select `AWS Device Farm` as the location in which to run the tests. Add the two secrets from the previous step to the boxes below that
+
+![AWS Device Farm credentials in Codemagic](img/codemagic-device-farm-credentials.png)
+
+### iOS Build Environment [Optional]
+
+For iOS builds you will also need to specify your Developer Portal Team ID. This can be found in the [https://developer.apple.com/account/#/membership](https://developer.apple.com/account/#/membership) console.
+
+Once you have retrieved your Developer Portal Team ID, create an Environment variable under the Codemagic settings for the `device_farm_demo` project:
+
+* **TEAM_ID**: ABCDEFGHIJ
+
+![Codemagic iOS Environment variable](img/codemagic-ios-environment-variable.png)
