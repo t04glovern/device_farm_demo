@@ -61,7 +61,7 @@ Next push the local source code up to this new repository by running the followi
 
 ```bash
 git init
-git remote add origin git@github.com:t04glovern/device_farm_demo.git
+git remote add origin https://github.com/t04glovern/device_farm_demo.git
 git add .
 git commit -m "init"
 git push -u origin master
