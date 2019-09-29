@@ -9,6 +9,8 @@ In this post we're going to look at a recent feature that [Codemagic](https://co
 * [Flutter installed](https://flutter.dev/docs/get-started/install) and up to date
 * AWS Account and [credentials setup for CLI access](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 
+The complete code for this post is available at [https://github.com/t04glovern/device_farm_demo](https://github.com/t04glovern/device_farm_demo)
+
 ## Create Flutter Project
 
 We'll start off by creating a new [Flutter](https://flutter.dev/) project that can be used for this demo. I've used VSCode to perform this step. We'll be setting up just enough in order to build for Android & iOS.
