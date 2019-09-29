@@ -212,6 +212,25 @@ test_suites:
 
 The contents of this file define the two device pools, one for iOS and the other for Android. Then it defines a test suite where it attaches the device pools to tests that should be run on the devices.
 
+**NOTE**: If you don't have a valid Apple Developer subscription you'll have to remove the iOS device pool. You can do so by commenting them out.
+
+```yaml
+device_pools:
+
+  # - pool_name: ios pool 1
+  #   pool_type: ios
+  #   devices:
+  #     - name: Apple iPhone X
+  #       model: A1865
+  #       os: 11.4
+
+...
+
+pool_names:
+  - android pool 1
+  # - ios pool 1
+```
+
 With all the required code now in the project, you can push the changed by running the following:
 
 ```bash
@@ -322,3 +341,29 @@ Once you have retrieved your Developer Portal Team ID, create an Environment var
 * **TEAM_ID**: ABCDEFGHIJ
 
 ![Codemagic iOS Environment variable](img/codemagic-ios-environment-variable.png)
+
+## Codemagic Run Build
+
+Upon running a new build after setting up AWS Device Farm, Codemagic will use Sylph in order to create new devices on AWS to test against.
+
+You can follow the progress either out of the Codemagic UI, or if you're interested in what's happening under the hood; navigate to the [Device Farm console](https://us-west-2.console.aws.amazon.com/devicefarm/home)
+
+![AWS Device Farm build overview](img/aws-devicefarm-example-01.png)
+
+You should see the device pool we defined in the `sylph.yaml` file from earlier. You are also able to dig down into the test suite job Codemagic created for us as well.
+
+![AWS Device Farm test running status](img/aws-devicefarm-example-02.png)
+
+Once the build completes you can view the status easily out of the Codemagic, or alternatively you can view the status in AWS Device Farm also.
+
+## Cleanup AWS
+
+If you no longer want the user account / policy that we created earlier on in this post, you can:
+
+* Delete the CloudFormation stack from the [CloudFormation console directly](https://console.aws.amazon.com/cloudformation/home)
+* Run the following command
+
+  ```bash
+  aws cloudformation delete-stack \
+    --stack-name iam-devicefarm-user
+  ```
