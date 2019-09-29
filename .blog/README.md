@@ -72,3 +72,240 @@ git push -u origin master
 Before diving into device farm we should also ensure that the current Flutter app builds okay on Codemagic. Once this is confirmed we'll be able to iterate faster while we're learning. You can access Codemagic at [https://codemagic.io/apps](https://codemagic.io/apps).
 
 Sign in with your account (preferably GitHub since we've already pushed our project there). Once signed in import the new repoistory as a Codemagic project.
+
+![Codemagic Import Device farm project](img/codemagic-device-farm-import.png)
+
+You will be prompted to select a branch, simply leave it on master and click `Start new build`.
+
+![Codemagic Import Device farm project build configuration](img/codemagic-device-farm-specify-config.png)
+
+The build could take up to 5 minutes to complete as it builds for both iOS and Android by default. Once successful you'll see a green tick and we can safely move on.
+
+![Codemagic Sample build task](img/codemagic-device-farm-sample-build.png)
+
+## Sylph Introduction
+
+[Sylph](https://github.com/mmcc007/sylph) is a wrapper around AWS Device farm that helps run integration tests for Flutter projects. It orchestrates device farm instances (both Android & iOS) that will run the Flutter code we push to it.
+
+### flutter_driver dependency
+
+The flutter_driver package is going to be required in order to test our project on emulated hardware automatically. To install this dependency to the project add the following to the `dev_dependencies` section of the `pubspec.yaml` file
+
+```yaml
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_driver:
+    sdk: flutter
+  test: ^1.5.2
+```
+
+#### test_driver setup
+
+There also has to be `test_driver` configurations added to the repository that define what interactions should take place on the emulator. To do this create a new folder and two sub files
+
+```bash
+> test_driver
+    - main_test.dart
+    - main.dart
+```
+
+Add the following to the files:
+
+##### main_test.dart
+
+```dart
+import 'package:flutter_driver/flutter_driver.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('end-to-end test', () {
+    FlutterDriver driver;
+
+    setUpAll(() async {
+      // Connect to a running Flutter application instance.
+      driver = await FlutterDriver.connect();
+    });
+
+    tearDownAll(() async {
+      if (driver != null) await driver.close();
+    });
+
+    test('tap on the floating action button; verify counter', () async {
+      // Finds the floating action button (fab) to tap on
+      SerializableFinder fab = find.byTooltip('Increment');
+
+      // Wait for the floating action button to appear
+      await driver.waitFor(fab);
+
+      // Tap on the fab
+      await driver.tap(fab);
+
+      // Wait for text to change to the desired value
+      await driver.waitFor(find.text('1'));
+    });
+  });
+}
+```
+
+##### main.dart
+
+```dart
+import 'package:device_farm_demo/main.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_driver/driver_extension.dart';
+
+void main() {
+  // Enable integration testing with the Flutter Driver extension.
+  // See https://flutter.io/testing/ for more info.
+  enableFlutterDriverExtension();
+  runApp(MyApp());
+}
+```
+
+### Sylph Example Configuration
+
+There's a very good example in the [Sylph repository](https://github.com/mmcc007/sylph#configuration) that we'll be tweaking for this demo.
+
+Create a new file in the root of the `device_farm_demo` project called `sylph.yaml`. Add the following contents to the file
+
+```yaml
+# sylph config
+tmp_dir: /tmp/sylph
+artifacts_dir: /tmp/sylph_artifacts
+# local timeout per device farm run
+sylph_timeout: 720 # seconds approx
+# run on ios and android pools concurrently (for faster results)
+concurrent_runs: true
+
+# device farm config
+project_name: App Integration Tests
+default_job_timeout: 10 # minutes, set at project creation
+
+device_pools:
+
+  - pool_name: android pool 1
+    pool_type: android
+    devices:
+      - name: Google Pixel 2
+        model: Google Pixel 2
+        os: 8.0.0
+
+  - pool_name: ios pool 1
+    pool_type: ios
+    devices:
+      - name: Apple iPhone X
+        model: A1865
+        os: 11.4
+
+test_suites:
+
+  - test_suite: example tests 1
+    main: test_driver/main.dart
+    tests:
+      - test_driver/main_test.dart
+    pool_names:
+      - android pool 1
+      - ios pool 1
+    job_timeout: 15 # minutes, set per job, over-rides default job timeout above
+```
+
+The contents of this file define the two device pools, one for iOS and the other for Android. Then it defines a test suite where it attaches the device pools to tests that should be run on the devices.
+
+With all the required code now in the project, you can push the changed by running the following:
+
+```bash
+git add .
+git commit -m "added sylph and test_driver"
+git push
+```
+
+## AWS Device Farm
+
+AWS Device Farm is a service where real devices are exposed for you to run integration tests in life like scenarios. The service itself is only available in Oregon region (us-west-2).
+
+### AWS Authentication
+
+To authenticate with AWS Device Farm we'll have to create a new user with the correct permission scope. This is important esspecially since we are going to be putting these credentials in Codemagic and don't want to over privilage them.
+
+I've created a nice CloudFormation template that can be used to create a `User`, `Group` and `Policy` with the appropriate permission set attached. More information about the scope can be found on the [offical documentation page](https://docs.aws.amazon.com/devicefarm/latest/developerguide/setting-up.html)
+
+Create a folder called `aws` and add a file to it called `device_farm_user.yaml` with the following contents
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Password:
+    NoEcho: 'true'
+    Type: String
+    Description: New account password
+    MinLength: '1'
+    MaxLength: '41'
+    ConstraintDescription: the password must be between 1 and 41 characters
+
+Resources:
+  DeviceFarmUser:
+    Type: AWS::IAM::User
+    Properties:
+      LoginProfile:
+        Password: !Ref 'Password'
+  DeviceFarmAdminGroup:
+    Type: AWS::IAM::Group
+  Admins:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref 'DeviceFarmAdminGroup'
+      Users: [!Ref 'DeviceFarmUser']
+  DeviceFarmAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: DeviceFarmList
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: ['devicefarm:*']
+          Resource: '*'
+      Groups: [!Ref 'DeviceFarmAdminGroup']
+  DeviceFarmKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref 'DeviceFarmUser'
+
+Outputs:
+  AccessKey:
+    Value: !Ref 'DeviceFarmKeys'
+    Description: AWSAccessKeyId of new user
+  SecretKey:
+    Value: !GetAtt [DeviceFarmKeys, SecretAccessKey]
+    Description: AWSSecretAccessKey of new user
+```
+
+Deploy the template by running the following command:
+
+```bash
+aws cloudformation create-stack \
+  --stack-name iam-devicefarm-user \
+  --template-body file://aws/device_farm_user.yaml \
+  --parameters ParameterKey=Password,ParameterValue=$(openssl rand -base64 30) \
+  --capabilities CAPABILITY_IAM
+```
+
+Retrieve the generated AWS Credentials by running the following two commands for each part of the set. **Keep these values private**
+
+```bash
+# Get AWS Access Key ID
+aws cloudformation describe-stacks --stack-name iam-devicefarm-user \
+  --query 'Stacks[0].Outputs[?OutputKey==`AccessKey`].OutputValue' \
+  --output text
+
+# Get AWS Secret Access Key
+aws cloudformation describe-stacks --stack-name iam-devicefarm-user \
+  --query 'Stacks[0].Outputs[?OutputKey==`SecretKey`].OutputValue' \
+  --output text
+```
+
+## Codemagic Device Farm Setup
+
+Finally we're able to setup Codemagic to use the credentials we just created to launch AWS Device Farm instances. Head back to Codemagic and go to the Settings page of the `device_farm_demo` project
+
