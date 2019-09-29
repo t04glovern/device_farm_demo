@@ -85,7 +85,7 @@ You will be prompted to select a branch, simply leave it on master and click `St
 
 The build could take up to 5 minutes to complete as it builds for both iOS and Android by default. Once successful you'll see a green tick and we can safely move on.
 
-![Codemagic Sample build task](img/codemagic-device-farm-sample-build.png)
+![Codemagic Sample build task complete](img/codemagic-device-farm-sample-build.png)
 
 ## Sylph Introduction
 
@@ -104,7 +104,7 @@ dev_dependencies:
   test: ^1.5.2
 ```
 
-#### test_driver setup
+### test_driver setup
 
 There also has to be `test_driver` configurations added to the repository that define what interactions should take place on the emulator. To do this create a new folder and two sub files
 
@@ -116,7 +116,7 @@ There also has to be `test_driver` configurations added to the repository that d
 
 Add the following to the files:
 
-##### main_test.dart
+#### main_test.dart
 
 ```dart
 import 'package:flutter_driver/flutter_driver.dart';
@@ -152,7 +152,7 @@ void main() {
 }
 ```
 
-##### main.dart
+#### main.dart
 
 ```dart
 import 'package:device_farm_demo/main.dart';
@@ -249,7 +249,7 @@ AWS Device Farm is a service where real devices are exposed for you to run integ
 
 ### AWS Authentication
 
-To authenticate with AWS Device Farm we'll have to create a new user with the correct permission scope. This is important esspecially since we are going to be putting these credentials in Codemagic and don't want to over privilage them.
+To authenticate with AWS Device Farm we'll have to create a new user with the correct permission scope. This is important especially since we are going to be putting these credentials in Codemagic and don't want to over privilege them.
 
 I've created a nice CloudFormation template that can be used to create a `User`, `Group` and `Policy` with the appropriate permission set attached. More information about the scope can be found on the [offical documentation page](https://docs.aws.amazon.com/devicefarm/latest/developerguide/setting-up.html)
 
@@ -330,7 +330,7 @@ aws cloudformation describe-stacks --stack-name iam-devicefarm-user \
 
 ## Codemagic Device Farm Setup
 
-Finally we're able to setup Codemagic to use the credentials we just created to launch AWS Device Farm instances. Head back to Codemagic and go to the Settings page of the `device_farm_demo` project
+Finally we are able to setup Codemagic to use the credentials we just created to launch AWS Device Farm instances. Head back to Codemagic and go to the Settings page of the `device_farm_demo` project
 
 Expand the `test` step and select `AWS Device Farm` as the location in which to run the tests. Add the two secrets from the previous step to the boxes below that
 
@@ -371,3 +371,9 @@ If you no longer want the user account / policy that we created earlier on in th
   aws cloudformation delete-stack \
     --stack-name iam-devicefarm-user
   ```
+
+## Learn More
+
+If you're interested in learning more about Codemagic, check out my previous post [Flutter CI/CD Deployments & Publication to Google Play](https://devopstar.com/2019/01/10/flutter-ci-cd-deployments-publication-to-google-play/)
+
+I also recommend checking out our [Flutter course](https://devopstar.com/flutter-promotion-2019/)
