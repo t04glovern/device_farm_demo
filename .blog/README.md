@@ -1,4 +1,4 @@
-# Flutter CI/CD with Codemagic, Slyph & AWS Device Farm
+# Flutter CI/CD with Codemagic, Sylph & AWS Device Farm
 
 A common problem with developing for mobile is the sheer variety of device options that have to be tested for when designing UI. Traditionally teams might have had a set of different mobile devices that could be used to verify a consistent expereience however without automation this QA process is easy to ignore.
 
