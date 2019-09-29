@@ -19,12 +19,12 @@ device_pools:
         model: Google Pixel 2
         os: 8.0.0
 
-  - pool_name: ios pool 1
-    pool_type: ios
-    devices:
-      - name: Apple iPhone X
-        model: A1865
-        os: 11.4
+  # - pool_name: ios pool 1
+  #   pool_type: ios
+  #   devices:
+  #     - name: Apple iPhone X
+  #       model: A1865
+  #       os: 11.4
 
 test_suites:
 
@@ -34,5 +34,5 @@ test_suites:
       - test_driver/main_test.dart
     pool_names:
       - android pool 1
-      - ios pool 1
+      # - ios pool 1
     job_timeout: 15 # minutes, set per job, over-rides default job timeout above
